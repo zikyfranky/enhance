@@ -566,9 +566,8 @@ contract ENHANCE is ERC20, Ownable {
         if(!(tokens > 0)) {
             return ;
         }
-        uint256 initialBalance = IERC20(REWARD).balanceOf(address(this));
         swapTokensForReward(tokens);
-        uint256 dividends = IERC20(REWARD).balanceOf(address(this)) - initialBalance;
+        uint256 dividends = IERC20(REWARD).balanceOf(address(this));
 
         bool success = IERC20(REWARD).transfer(address(dividendTracker), dividends);
 
