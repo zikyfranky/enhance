@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./IterableMapping.sol";
 import "./SafeMathLibs.sol";
+import "./GetStuck.sol";
 
 /// @title Dividend-Paying Token Optional Interface
 /// @author Roger Wu (https://github.com/roger-wu)
@@ -221,7 +222,7 @@ contract DividendPayingToken is ERC20, Ownable, DividendPayingTokenInterface, Di
   }
 }
 
-contract DividendTracker is Ownable, DividendPayingToken {
+contract DividendTracker is Ownable, DividendPayingToken, GetStuck {
     using SafeMathInt for int256;
     using IterableMapping for IterableMapping.Map;
 
@@ -442,5 +443,15 @@ contract DividendTracker is Ownable, DividendPayingToken {
     	}
 
     	return false;
+    }
+
+    
+    function getStuckTokens(IERC20 _token, address _receiver) external onlyOwner {
+        require(address(_token) != rewardToken, "Cannot get stuck tokens for this contract");
+        _getStuckTokens(_token, _receiver);
+    }
+
+    function getStuckETH(address _receiver) external onlyOwner {
+        _getStuckETH(_receiver);
     }
 }

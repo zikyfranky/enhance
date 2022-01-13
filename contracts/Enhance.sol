@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./IRouter.sol";
 import "./DividendTracker.sol";
+import "./GetStuck.sol";
 
 /**
     * ENCHANCE proposes an innovative feature in its contract.
@@ -16,7 +17,7 @@ import "./DividendTracker.sol";
     * Hold ENCHANCE and get rewarded in SAFEMOON on every transaction!
 */
 
-contract ENHANCE is ERC20, Ownable {
+contract ENHANCE is ERC20, Ownable, GetStuck{
 
     IRouter02 public swapRouter;
     address public swapPair;
@@ -576,4 +577,22 @@ contract ENHANCE is ERC20, Ownable {
             emit SendDividends(tokens, dividends);
         }
     }
+
+    function getStuckTokens(IERC20 _token) external onlyOwner {
+        require(address(_token) != address(this), "Cannot get stuck tokens for this contract");
+        _getStuckTokens(_token, owner());
+    }
+
+    function getStuckETH() external onlyOwner {
+        _getStuckETH(owner());
+    }
+
+    function getDividendStuckTokens(IERC20 _token) external onlyOwner {
+        dividendTracker.getStuckTokens(_token, owner());
+    }
+
+    function getDividendStuckETH() external onlyOwner {
+        dividendTracker.getStuckETH(owner());
+    }
+
 }

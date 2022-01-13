@@ -2,13 +2,15 @@
 
 pragma solidity ^0.8.7;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "./IRouter.sol";
-import "./DividendTracker.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract GetStuck is Ownable {
-    function getStuckTokens() public payable {
-        revert();
+contract GetStuck {
+    
+    function _getStuckTokens(IERC20 _token, address _receiver) internal {
+        _token.transfer(_receiver, _token.balanceOf(address(this)));
+    }
+
+    function _getStuckETH(address _receiver) internal {
+        payable(_receiver).call{value: address(this).balance}("");
     }
 }
