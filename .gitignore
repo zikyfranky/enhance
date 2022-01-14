@@ -1,4 +1,9 @@
-build
 node_modules
 .env
-*.lock
+coverage
+coverage.json
+typechain
+
+#Hardhat files
+cache
+artifacts
