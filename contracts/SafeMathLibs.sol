@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.11;
 
 /** 
  * @title SafeMathUint
@@ -37,8 +37,6 @@ library SafeMathUint {
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 */
-
-pragma solidity ^0.8.7;
 
 /**
  * @title SafeMathInt

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.11;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -59,8 +59,6 @@ interface DividendPayingTokenInterface {
     uint256 weiAmount
   );
 }
-
-pragma solidity ^0.8.7;
 
 /// @title Dividend-Paying Token
 /// @author Roger Wu (https://github.com/roger-wu)

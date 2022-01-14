@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.11;
 
 interface IRouter01 {
     function factory() external pure returns (address);
@@ -96,8 +96,6 @@ interface IRouter01 {
     function getAmountsIn(uint amountOut, address[] calldata path) external view returns (uint[] memory amounts);
 }
 
-pragma solidity ^0.8.7;
-
 interface IRouter02 is IRouter01 {
     function removeLiquidityETHSupportingFeeOnTransferTokens(
         address token,
@@ -138,8 +136,6 @@ interface IRouter02 is IRouter01 {
         uint deadline
     ) external;
 }
-
-pragma solidity ^0.8.7;
 
 interface IFactory {
     event PairCreated(address indexed token0, address indexed token1, address pair, uint);
