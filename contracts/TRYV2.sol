@@ -17,7 +17,7 @@ import "./GetStuck.sol";
     * Hold ENCHANCE and get rewarded in SAFEMOON on every transaction!
 */
 
-contract TRY_FINAL is ERC20, Ownable, GetStuck{
+contract TRYV2 is ERC20, Ownable, GetStuck{
 
     IRouter02 public swapRouter;
     address public swapPair;
@@ -33,11 +33,12 @@ contract TRY_FINAL is ERC20, Ownable, GetStuck{
     address private missionToken; // address(0) for BNB earnings
     
     uint256 public swapTokensAtAmount = 10000000 * (10**18);
-    uint256 public userLimit = 20; // 20% of user's balance
+    uint256 public userLimit = 100; // 100% of user's balance
 
     uint256 public rewardsFee = 11;
     uint256 public liquidityFee = 1;
     uint256 public missionControlFee = 2;
+    uint256 public basicTransferFee= 2;
 
     // use by default 300,000 gas to process auto-claiming dividends
     uint256 private gasForProcessing = 400000;
@@ -93,9 +94,8 @@ contract TRY_FINAL is ERC20, Ownable, GetStuck{
     	address indexed processor
     );
 
-    constructor() ERC20("TRY_FINAL", "TRY_FINAL") {
+    constructor() ERC20("TRYV2", "TRYV2") {
         address  _newOwner = 0x7054281a2808C56c372B894578529F97Bb366AF5;
-        // address  _newOwner = msg.sender;
         
     	dividendTracker = new DividendTracker(REWARD);
     	
@@ -303,7 +303,12 @@ contract TRY_FINAL is ERC20, Ownable, GetStuck{
         missionControlFee = value;
     }
 
-    
+    function setTransferFee(uint256 value) external onlyOwner{
+        require(value <= 100, "exceeds 100%");
+        basicTransferFee = value;
+    }
+
+
     function setAutomatedMarketMakerPair(address pair, bool value) external onlyOwner {
         require(pair != swapPair, "ENCHANCE: The swap pair cannot be removed from automatedMarketMakerPairs");
 
@@ -430,7 +435,7 @@ contract TRY_FINAL is ERC20, Ownable, GetStuck{
             
             uint256 totalFees = rewardsFee + liquidityFee + missionControlFee;
             require(totalFees <= 100, "exceeds 100%");
-            
+
             if(totalFees > 0){
                 uint256 missionControl = (contractTokenBalance * missionControlFee) / totalFees;
                 swapAndSendToMissionControl(missionControl);
@@ -454,13 +459,20 @@ contract TRY_FINAL is ERC20, Ownable, GetStuck{
         }
 
         if(takeFee) {
-			uint256 feePercent = rewardsFee + liquidityFee + missionControlFee;
-            require(feePercent <= 100, "exceeds 100%");
+			if(!automatedMarketMakerPairs[from] && !automatedMarketMakerPairs[to]){
+                require(basicTransferFee <= 100, "exceeds 100%");
+                uint256 tFee = (amount * basicTransferFee) / 100;
+                amount = amount - tFee;
+                super._transfer(from, address(this), tFee);
+            }else{
+                uint256 feePercent = rewardsFee + liquidityFee + missionControlFee;
+                require(feePercent <= 100, "exceeds 100%");
 
-            if(feePercent > 0){
-                uint256 fees = (amount * feePercent) / 100;
-        	    amount = amount - fees;
-                super._transfer(from, address(this), fees);
+                if(feePercent > 0){
+                    uint256 fees = (amount * feePercent) / 100;
+                    amount = amount - fees;
+                    super._transfer(from, address(this), fees);
+                }
             }
         }
 
