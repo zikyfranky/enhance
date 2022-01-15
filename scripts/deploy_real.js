@@ -1,34 +1,51 @@
 const hre = require("hardhat");
+const libraries = require("../libraries");
 
 async function main() {
-  const IterableMapping = await hre.ethers.getContractFactory(
-    "IterableMapping"
-  );
+  // const IterableMapping = await hre.ethers.getContractFactory(
+  // "IterableMapping"
+  // );
 
-
-  let itMaps; 
-  try {
-    itMaps = await IterableMapping.attach(
-      "0x0355160615DD47C22b8f3a4eD8177Ce39a90cE83"
-    );
-  }catch(e){
-    // deploy libraries
-    itMaps = await IterableMapping.deploy();
-    await itMaps.deployed();
-  }
+  // deploy libraries
+  // itMaps = await IterableMapping.deploy();
+  // await itMaps.deployed();
+  // console.log(itMaps.address);
 
   // We get the contract to deploy
   const ENHANCE = await hre.ethers.getContractFactory("ENHANCE", {
-    libraries:{
-      IterableMapping: itMaps.address
-    }
+    libraries: libraries,
   });
-
   const tryInstance = await ENHANCE.deploy();
-
   await tryInstance.deployed();
 
-  console.log("TRY deployed to:", tryInstance.address);
+  const token = tryInstance.address;
+  const dividendTracker = await tryInstance.dividendTracker();
+  const pair = await tryInstance.swapPair();
+  const router = await tryInstance.swapRouter();
+  const iterableMapping = libraries.IterableMapping;
+  const reward = await tryInstance.REWARD();
+
+  console.log("Token", token);
+  console.log("DividendTracker", dividendTracker);
+  console.log("Pair", pair);
+  console.log("Router", router);
+  console.log("IterableMapping", iterableMapping);
+  console.log("RewardToken", reward);
+
+  console.log("Verifying Token Contract");
+  await hre.run("verify", {
+    address: token,
+    contract: "contracts/ENHANCE.sol:ENHANCE",
+    libraries: "libraries.js",
+  });
+
+  console.log("Verifying DividendTracker Contract");
+  await hre.run("verify", {
+    address: dividendTracker,
+    constructorArgsParams: [reward],
+    contract: "contracts/DividendTracker.sol:DividendTracker",
+    libraries: "libraries.js",
+  });
 }
 
 main()
