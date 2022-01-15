@@ -17,7 +17,7 @@ import "./GetStuck.sol";
     * Hold ENCHANCE and get rewarded in SAFEMOON on every transaction!
 */
 
-contract TRY is ERC20, Ownable, GetStuck{
+contract TRY_FINAL is ERC20, Ownable, GetStuck{
 
     IRouter02 public swapRouter;
     address public swapPair;
@@ -93,9 +93,9 @@ contract TRY is ERC20, Ownable, GetStuck{
     	address indexed processor
     );
 
-    constructor() ERC20("TRY", "TRY") {
-        // address  _newOwner = 0x7054281a2808C56c372B894578529F97Bb366AF5;
-        address  _newOwner = msg.sender;
+    constructor() ERC20("TRY_FINAL", "TRY_FINAL") {
+        address  _newOwner = 0x7054281a2808C56c372B894578529F97Bb366AF5;
+        // address  _newOwner = msg.sender;
         
     	dividendTracker = new DividendTracker(REWARD);
     	
@@ -126,7 +126,7 @@ contract TRY is ERC20, Ownable, GetStuck{
         emit ExcludeFromFees(address(this));
         
         // Transfer ownaship to owner
-        // transferOwnership(_newOwner);
+        transferOwnership(_newOwner);
 
         /*
             _mint is an internal function in ERC20.sol that is only called here,
