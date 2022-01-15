@@ -33,7 +33,7 @@ contract ENHANCE is ERC20, Ownable, GetStuck{
     address private missionToken; // address(0) for BNB earnings
     
     uint256 public swapTokensAtAmount = 10000000 * (10**18);
-    uint256 public userLimit = 20% of user's balance
+    uint256 public userLimit = 20; // 20% of user's balance
 
     uint256 public rewardsFee = 11;
     uint256 public liquidityFee = 1;
@@ -50,7 +50,11 @@ contract ENHANCE is ERC20, Ownable, GetStuck{
 
      // exlcude from fees and max transaction amount
     mapping (address => bool) public _isExcludedFromFees;
-    
+
+    // store addresses that a automatic market maker pairs. Any transfer *to* these addresses
+    // could be subject to a maximum transfer amount
+    mapping (address => bool) private automatedMarketMakerPairs; 
+
     event UpdateDividendTracker(address indexed newAddress, address indexed oldAddress);
 
     event UpdateSwapRouter(address indexed newAddress, address indexed oldAddress);
@@ -59,6 +63,8 @@ contract ENHANCE is ERC20, Ownable, GetStuck{
     event ExcludeMultipleAccountsFromFees(address[] accounts);
     event IncludeInFees(address indexed account);
     event IncludeMultipleAccountsInFees(address[] accounts);
+
+    event SetAutomatedMarketMakerPair(address indexed pair, bool indexed value);
 
     event BlacklistAccount(address indexed account);
     event BlacklistMultipleAccounts(address[] accounts);
@@ -102,6 +108,7 @@ contract ENHANCE is ERC20, Ownable, GetStuck{
         swapRouter = _swapRouter;
         swapPair = _swapPair;
 
+        _setAutomatedMarketMakerPair(swapPair, true);
         init(_newOwner);
 
         // unlimit addresses
@@ -234,7 +241,7 @@ contract ENHANCE is ERC20, Ownable, GetStuck{
         }
 
         swapPair = _swapPair;
-
+        _setAutomatedMarketMakerPair(swapPair, true);
         // exclude from dividends
         init(owner());
 
@@ -293,6 +300,25 @@ contract ENHANCE is ERC20, Ownable, GetStuck{
     function setMissionControlFee(uint256 value) external onlyOwner{
         require(value <= 100, "exceeds 100%");
         missionControlFee = value;
+    }
+
+    
+    function setAutomatedMarketMakerPair(address pair, bool value) external onlyOwner {
+        require(pair != swapPair, "ENCHANCE: The swap pair cannot be removed from automatedMarketMakerPairs");
+
+        _setAutomatedMarketMakerPair(pair, value);
+    }
+
+    function _setAutomatedMarketMakerPair(address pair, bool value) private {
+        if(automatedMarketMakerPairs[pair] == value) return;
+        
+        automatedMarketMakerPairs[pair] = value;
+
+        if(value) {
+            dividendTracker.excludeFromDividends(pair);
+        }
+
+        emit SetAutomatedMarketMakerPair(pair, value);
     }
 
     function updateGasForProcessing(uint256 newValue) external onlyOwner {
@@ -395,6 +421,7 @@ contract ENHANCE is ERC20, Ownable, GetStuck{
 
         if( canSwap &&
             !swapping &&
+            !automatedMarketMakerPairs[from] &&
             from != owner() &&
             to != owner()
         ) {
