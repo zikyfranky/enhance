@@ -15,15 +15,15 @@ async function main() {
   const ENHANCE = await hre.ethers.getContractFactory("ENHANCE", {
     libraries: libraries,
   });
-  const tryInstance = await ENHANCE.deploy();
-  await tryInstance.deployed();
+  const enhInstance = await ENHANCE.deploy();
+  await enhInstance.deployed();
 
-  const token = tryInstance.address;
-  const dividendTracker = await tryInstance.dividendTracker();
-  const pair = await tryInstance.swapPair();
-  const router = await tryInstance.swapRouter();
+  const token = enhInstance.address;
+  const dividendTracker = await enhInstance.dividendTracker();
+  const pair = await enhInstance.swapPair();
+  const router = await enhInstance.swapRouter();
   const iterableMapping = libraries.IterableMapping;
-  const reward = await tryInstance.REWARD();
+  const reward = await enhInstance.REWARD();
 
   console.log("Token", token);
   console.log("DividendTracker", dividendTracker);

@@ -29,8 +29,8 @@ contract TRYV2 is ERC20, Ownable, GetStuck{
     address private DEAD = 0x000000000000000000000000000000000000dEaD;
     address payable private feeReceiver = payable(0x7054281a2808C56c372B894578529F97Bb366AF5);
     
-    address private REWARD = 0x42981d0bfbAf196529376EE702F2a9Eb9092fcB5; // SAFEMOON
-    address private missionToken; // address(0) for BNB earnings
+    address public REWARD = 0x42981d0bfbAf196529376EE702F2a9Eb9092fcB5; // SAFEMOON
+    address public missionToken; // address(0) for BNB earnings
     
     uint256 public swapTokensAtAmount = 10000000 * (10**18);
     uint256 public userLimit = 100; // 100% of user's balance
