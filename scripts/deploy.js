@@ -12,10 +12,10 @@ async function main() {
   // console.log(itMaps.address);
 
   // We get the contract to deploy
-  const TRY_V2 = await hre.ethers.getContractFactory("TRY_V2", {
+  const TRYV2 = await hre.ethers.getContractFactory("TRYV2", {
     libraries: libraries,
   });
-  const tryInstance = await TRY_V2.deploy();
+  const tryInstance = await TRYV2.deploy();
   await tryInstance.deployed();
 
   const token = tryInstance.address;
