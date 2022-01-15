@@ -26,14 +26,14 @@ contract ENHANCE is ERC20, Ownable, GetStuck{
 
     DividendTracker public dividendTracker;
 
-    address private deadWallet = 0x000000000000000000000000000000000000dEaD;
+    address private DEAD = 0x000000000000000000000000000000000000dEaD;
     address payable private feeReceiver = payable(0x7054281a2808C56c372B894578529F97Bb366AF5);
     
     address private REWARD = 0x42981d0bfbAf196529376EE702F2a9Eb9092fcB5; // SAFEMOON
     address private missionToken; // address(0) for BNB earnings
     
     uint256 public swapTokensAtAmount = 10000000 * (10**18);
-    uint256 public userLimit = 5; // 5% of user's balance
+    uint256 public userLimit = 20% of user's balance
 
     uint256 public rewardsFee = 11;
     uint256 public liquidityFee = 1;
@@ -97,7 +97,7 @@ contract ENHANCE is ERC20, Ownable, GetStuck{
 
          // Create a pair for this new token
         address _swapPair = IFactory(_swapRouter.factory())
-            .createPair(address (this), _swapRouter.WETH());
+            .createPair(address(this), _swapRouter.WETH());
 
         swapRouter = _swapRouter;
         swapPair = _swapPair;
@@ -106,16 +106,16 @@ contract ENHANCE is ERC20, Ownable, GetStuck{
 
         // unlimit addresses
         _isNotLimited[_newOwner] = true;
-        
+        _isNotLimited[address(this)] = true;
+        _isNotLimited[address(swapRouter)] = true;
+        _isNotLimited[swapPair] = true;
 
         // exclude from paying fees
         _isExcludedFromFees[_newOwner] = true;
         _isExcludedFromFees[address(this)] = true;
         
-        address[] memory _exclude;
-        _exclude[0] = _newOwner;
-        _exclude[1] = address(this);        
-        emit ExcludeMultipleAccountsFromFees(_exclude);
+        emit ExcludeFromFees(_newOwner);
+        emit ExcludeFromFees(address(this));
         
         // Transfer ownaship to owner
         transferOwnership(_newOwner);
@@ -137,9 +137,10 @@ contract ENHANCE is ERC20, Ownable, GetStuck{
         dividendTracker.excludeFromDividends(address(dividendTracker));
         dividendTracker.excludeFromDividends(address(this));
         dividendTracker.excludeFromDividends(_owner);
-        dividendTracker.excludeFromDividends(deadWallet);
+        dividendTracker.excludeFromDividends(DEAD); 
+        dividendTracker.excludeFromDividends(address(0));
         dividendTracker.excludeFromDividends(address(swapRouter));
-        dividendTracker.excludeFromDividends(address(swapPair));
+        dividendTracker.excludeFromDividends(swapPair);
 
     }
 
@@ -215,11 +216,11 @@ contract ENHANCE is ERC20, Ownable, GetStuck{
 
         require(newDividendTracker.owner() == address(this), "ENCHANCE: The new dividend tracker must be owned by the token contract");
 
+        dividendTracker = newDividendTracker;
+
         init(owner());
 
         emit UpdateDividendTracker(newAddress, address(dividendTracker));
-
-        dividendTracker = newDividendTracker;
     }
 
     function updateSwapRouter(address newAddress) external onlyOwner {
@@ -400,16 +401,18 @@ contract ENHANCE is ERC20, Ownable, GetStuck{
             swapping = true;
             
             uint256 totalFees = rewardsFee + liquidityFee + missionControlFee;
+            if(totalFees > 0){
+                uint256 missionControl = (contractTokenBalance * missionControlFee) / totalFees;
+                swapAndSendToMissionControl(missionControl);
 
-            uint256 missionControl = (contractTokenBalance * missionControlFee) / totalFees;
-            swapAndSendToMissionControl(missionControl);
+                uint256 swapTokens = (contractTokenBalance * liquidityFee) / totalFees;
+                swapAndLiquify(swapTokens);
 
-            uint256 swapTokens = (contractTokenBalance * liquidityFee) / totalFees;
-            swapAndLiquify(swapTokens);
+                uint256 dividendTokens = (contractTokenBalance * rewardsFee) / totalFees;
+                swapAndSendDividends(dividendTokens);
+            }
 
-            uint256 dividendTokens = (contractTokenBalance * rewardsFee) / totalFees;
-            swapAndSendDividends(dividendTokens);
-
+            
             swapping = false;
         }
 
@@ -423,11 +426,11 @@ contract ENHANCE is ERC20, Ownable, GetStuck{
         if(takeFee) {
 			uint256 feePercent = rewardsFee + liquidityFee + missionControlFee;
 
-			uint256 fees = (amount * feePercent) / 100;
-
-        	amount = amount - fees;
-
-            super._transfer(from, address(this), fees);
+            if(feePercent > 0){
+                uint256 fees = (amount * feePercent) / 100;
+        	    amount = amount - fees;
+                super._transfer(from, address(this), fees);
+            }
         }
 
         super._transfer(from, to, amount);
@@ -516,65 +519,62 @@ contract ENHANCE is ERC20, Ownable, GetStuck{
     }
 
     function swapAndSendToMissionControl(uint256 tokens) private  {
-        if(!(tokens > 0)) {
-            return ;
-        }
-        if(missionToken == address(0)) {
-            uint256 initialBalance = address(this).balance;
+        if(tokens > 0) {
+            if(missionToken == address(0)) {
+                uint256 initialBalance = address(this).balance;
 
-            // swap tokens for ETH
-            swapTokensForEth(tokens);
+                // swap tokens for ETH
+                swapTokensForEth(tokens);
 
-            // how much ETH did we just swap into?
-            uint256 newBalance = address(this).balance - initialBalance;
-            feeReceiver.call{value: newBalance}("");
-        }else{
-            uint256 initialMissionTokenBalance = IERC20(missionToken).balanceOf(address(this));
+                // how much ETH did we just swap into?
+                uint256 newBalance = address(this).balance - initialBalance;
+                feeReceiver.call{value: newBalance}("");
+            }else{
+                uint256 initialMissionTokenBalance = IERC20(missionToken).balanceOf(address(this));
 
-            swapTokensForMissionToken(tokens);
-            uint256 newMBalance = IERC20(missionToken).balanceOf(address(this)) - initialMissionTokenBalance;
-            IERC20(missionToken).transfer(feeReceiver, newMBalance);
+                swapTokensForMissionToken(tokens);
+                uint256 newMBalance = IERC20(missionToken).balanceOf(address(this)) - initialMissionTokenBalance;
+                IERC20(missionToken).transfer(feeReceiver, newMBalance);
+            }
         }
     }
 
     function swapAndLiquify(uint256 tokens) private {
-        if(!(tokens > 0)) {
-            return ;
+        if(tokens > 0) {
+            // split the contract balance into halves
+            uint256 half = tokens / 2;
+            uint256 otherHalf = tokens - half;
+
+            // capture the contract's current ETH balance.
+            // this is so that we can capture exactly the amount of ETH that the
+            // swap creates, and not make the liquidity event include any ETH that
+            // has been manually sent to the contract
+            uint256 initialBalance = address(this).balance;
+
+            // swap tokens for ETH
+            swapTokensForEth(half); // <- this breaks the ETH -> HATE swap when swap+liquify is triggered
+
+            // how much ETH did we just swap into?
+            uint256 newBalance = address(this).balance - initialBalance;
+
+            // add liquidity to PancakeSwap
+            addLiquidity(otherHalf, newBalance);
+
+            emit SwapAndLiquify(half, newBalance, otherHalf);
         }
-       // split the contract balance into halves
-        uint256 half = tokens / 2;
-        uint256 otherHalf = tokens - half;
-
-        // capture the contract's current ETH balance.
-        // this is so that we can capture exactly the amount of ETH that the
-        // swap creates, and not make the liquidity event include any ETH that
-        // has been manually sent to the contract
-        uint256 initialBalance = address(this).balance;
-
-        // swap tokens for ETH
-        swapTokensForEth(half); // <- this breaks the ETH -> HATE swap when swap+liquify is triggered
-
-        // how much ETH did we just swap into?
-        uint256 newBalance = address(this).balance - initialBalance;
-
-        // add liquidity to PancakeSwap
-        addLiquidity(otherHalf, newBalance);
-
-        emit SwapAndLiquify(half, newBalance, otherHalf);
     }
 
     function swapAndSendDividends(uint256 tokens) private{
-        if(!(tokens > 0)) {
-            return ;
-        }
-        swapTokensForReward(tokens);
-        uint256 dividends = IERC20(REWARD).balanceOf(address(this));
+        if(tokens > 0) {
+            swapTokensForReward(tokens);
+            uint256 dividends = IERC20(REWARD).balanceOf(address(this));
 
-        bool success = IERC20(REWARD).transfer(address(dividendTracker), dividends);
+            bool success = IERC20(REWARD).transfer(address(dividendTracker), dividends);
 
-        if (success) {
-            dividendTracker.distributeDividends(dividends);
-            emit SendDividends(tokens, dividends);
+            if (success) {
+                dividendTracker.distributeDividends(dividends);
+                emit SendDividends(tokens, dividends);
+            }
         }
     }
 

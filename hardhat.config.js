@@ -1,4 +1,5 @@
 require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-etherscan");
 require("dotenv").config();
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -25,13 +26,16 @@ module.exports = {
       url: `https://data-seed-prebsc-1-s1.binance.org:8545`,
       accounts: [process.env.BSC_PRIVATE_KEY],
       chainId: 97,
+      timeout: 10000000,
     },
 
     //BINANCE SMART CHAIN MAINNET
     bsc_main: {
-      url: `https://bsc-dataseed1.binance.org`,
+      url: process.env.MORALIS_ENDPOINT,
+      // url: `https://bsc-dataseed1.binance.org`,
       accounts: [process.env.BSC_PRIVATE_KEY],
       chainId: 56,
+      timeout: 10000000,
     },
   },
   solidity: {
