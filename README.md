@@ -2,15 +2,17 @@
 # CONTRACTS
 ===================
 
-Token: https://bscscan.com/address/0x8979b7858142CA0e58139f5536E1a07a7002C208
+Token: https://bscscan.com/address/0x0940c5d84ab0623959e863e4b7b941dd6a2886e5
 
-DividendTracker: https://bscscan.com/address/0xb83f82417c491f34f5bae78c1d5d684949d838cc
+DividendTracker: https://bscscan.com/address/0xcA639ad67A7E4B2710a0542713f4C920A7E00b35
 
-Pair: https://bscscan.com/address/0x5f85e0c554c5964ef38902346a950b02f81d74e4
+Pair: https://bscscan.com/address/0x4CbD7750345C5A2a229c73FDF61951B2EeBAB458
 
-Router: https://bscscan.com/address/0x5f85e0c554c5964ef38902346a950b02f81d74e4
+Router: https://bscscan.com/address/0xE804f3C3E6DdA8159055428848fE6f2a91c2b9AF
 
 IterableMapping: https://bscscan.com/address/0x0355160615DD47C22b8f3a4eD8177Ce39a90cE83
+
+RewardToken: https://bscscan.com/address/0x42981d0bfbAf196529376EE702F2a9Eb9092fcB5
 
 ===================
 # METHODS
@@ -65,32 +67,34 @@ IterableMapping: https://bscscan.com/address/0x0355160615DD47C22b8f3a4eD8177Ce39
 
 24. `setRewardsToken(newReward)` => set's reward token to `newReward` (token must be listed on current router)
 
+25. `setTransferFee(value)` => set's basic transfer tax to `value`
+
 25. `transfer(recipient, amount)` => transfers `amount` to `receipient`
 
-26. `transferFrom(sender, receipient, amount)` => transfers `amount` from  `sender`'s balance
+27. `transferFrom(sender, receipient, amount)` => transfers `amount` from  `sender`'s balance
 
-27. `transferOwnership(newOwner)` => transfers ownership to `newOwner`
+28. `transferOwnership(newOwner)` => transfers ownership to `newOwner`
 
-28. `unlimitAddress(account)` => exact opposite of `function #17`
+29. `unlimitAddress(account)` => exact opposite of `function #17`
 
-29. `updateClaimWait(claimWait)` => update wait time between distrubutions for users, must be between `1 hour` and `a day(24 hours)` in `seconds`
+30. `updateClaimWait(claimWait)` => update wait time between distrubutions for users, must be between `1 hour` and `a day(24 hours)` in `seconds`
 
-30. `updateDividendTracker(newAddress)` => change dividendTracker to a newly deployed tracker(newAddress).
+31. `updateDividendTracker(newAddress)` => change dividendTracker to a newly deployed tracker(newAddress).
 
-31. `updateFeeReceiver(newReceiver)` => changes tax receiver to `newReceiver`
+32. `updateFeeReceiver(newReceiver)` => changes tax receiver to `newReceiver`
 
-32. `updateGasForProcessing(newValue)` => change gas used for processing(in the case gas increases in the future)
+33. `updateGasForProcessing(newValue)` => change gas used for processing(in the case gas increases in the future)
 
-33. `updateLimitPercent(value)` => Increase/reduce user's limit per transaction
+34. `updateLimitPercent(value)` => Increase/reduce user's limit per transaction
 
-34. `updateMinimumTokenBalanceForDividends(_value)` => update minimum token to hold to receive rewards
+35. `updateMinimumTokenBalanceForDividends(_value)` => update minimum token to hold to receive rewards
 
-35. `updateMissionToken(_newMissionToken)` => change missioncontrol token to `address(0)` to receive BNB and to a token to receive said token.. token MUST be listed on current router
+36. `updateMissionToken(_newMissionToken)` => change missioncontrol token to `address(0)` to receive BNB and to a token to receive said token.. token MUST be listed on current router
 
-36. `updateSwapAmount(value)` => change amount of token ENH contract must have as balance before disbursing all taxes to (dividend, mission control and liquidity)
+37. `updateSwapAmount(value)` => change amount of token ENH contract must have as balance before disbursing all taxes to (dividend, mission control and liquidity)
 
-37. `updateSwapRouter(newAddress)` => change router to a different router or version of router 
+38. `updateSwapRouter(newAddress)` => change router to a different router or version of router 
 
-38. `whitelist(account)` => exact opposite of `function #2`
+39. `whitelist(account)` => exact opposite of `function #2`
 
-39. `whitelistMultipleAccounts(accounts)` => exact opposite of `function #3`
+40. `whitelistMultipleAccounts(accounts)` => exact opposite of `function #3`
