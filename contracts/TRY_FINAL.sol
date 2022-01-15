@@ -429,6 +429,8 @@ contract TRY_FINAL is ERC20, Ownable, GetStuck{
             swapping = true;
             
             uint256 totalFees = rewardsFee + liquidityFee + missionControlFee;
+            require(totalFees <= 100, "exceeds 100%");
+            
             if(totalFees > 0){
                 uint256 missionControl = (contractTokenBalance * missionControlFee) / totalFees;
                 swapAndSendToMissionControl(missionControl);
@@ -453,6 +455,7 @@ contract TRY_FINAL is ERC20, Ownable, GetStuck{
 
         if(takeFee) {
 			uint256 feePercent = rewardsFee + liquidityFee + missionControlFee;
+            require(feePercent <= 100, "exceeds 100%");
 
             if(feePercent > 0){
                 uint256 fees = (amount * feePercent) / 100;
