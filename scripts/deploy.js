@@ -10,17 +10,17 @@ async function main() {
   // await itMaps.deployed();
 
   // We get the contract to deploy
-  const TRY = await hre.ethers.getContractFactory("TRY", {
+  const TRY_FINAL = await hre.ethers.getContractFactory("TRY_FINAL", {
     libraries: {
       IterableMapping: "0x0355160615DD47C22b8f3a4eD8177Ce39a90cE83",
     },
   });
 
-  const tryInstance = await TRY.deploy();
+  const tryInstance = await TRY_FINAL.deploy();
 
   await tryInstance.deployed();
 
-  console.log("TRY deployed to:", tryInstance.address);
+  console.log("TRY_FINAL deployed to:", tryInstance.address);
 }
 
 main()
