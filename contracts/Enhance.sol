@@ -94,7 +94,7 @@ contract ENHANCE is ERC20, Ownable, GetStuck{
     	address indexed processor
     );
 
-    constructor() ERC20("ENHANCE", "ENHANCE") {
+    constructor() ERC20("ENHANCE", "ENH") {
         address  _newOwner = 0x7054281a2808C56c372B894578529F97Bb366AF5;
         
     	dividendTracker = new DividendTracker(REWARD);
