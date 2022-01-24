@@ -101,4 +101,3 @@ library SafeMathInt {
         return uint256(a);
     }
 }
-

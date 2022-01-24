@@ -30,6 +30,7 @@ contract ENHANCE is ERC20, Ownable, GetStuck{
     address payable private feeReceiver = payable(0x7054281a2808C56c372B894578529F97Bb366AF5);
     
     address public REWARD = 0x42981d0bfbAf196529376EE702F2a9Eb9092fcB5; // SAFEMOON
+    address public ROUTER = 0xE804f3C3E6DdA8159055428848fE6f2a91c2b9AF;
     address public missionToken; // address(0) for BNB earnings
     
     uint256 public swapTokensAtAmount = 10000000 * (10**18);
@@ -95,12 +96,10 @@ contract ENHANCE is ERC20, Ownable, GetStuck{
     );
 
     constructor() ERC20("ENHANCE", "ENH") {
-        address  _newOwner = 0x7054281a2808C56c372B894578529F97Bb366AF5;
         
     	dividendTracker = new DividendTracker(REWARD);
     	
-        IRouter02 _swapRouter = IRouter02(0xE804f3C3E6DdA8159055428848fE6f2a91c2b9AF); //SAFEMOON_SWAP MAINNET
-        // IRouter02 _swapRouter = IRouter02(0x303BD61Fb70E563BbE833fA698D3ADa22Fd2DACa);//SAFEMOON_SWAP TESTNET
+        IRouter02 _swapRouter = IRouter02(ROUTER);
 
          // Create a pair for this new token
         address _swapPair = IFactory(_swapRouter.factory())
@@ -110,23 +109,23 @@ contract ENHANCE is ERC20, Ownable, GetStuck{
         swapPair = _swapPair;
 
         _setAutomatedMarketMakerPair(swapPair, true);
-        init(_newOwner);
+        init(owner());
 
         // unlimit addresses
-        _isNotLimited[_newOwner] = true;
+        _isNotLimited[owner()] = true;
         _isNotLimited[address(this)] = true;
         _isNotLimited[address(swapRouter)] = true;
         _isNotLimited[swapPair] = true;
 
         // exclude from paying fees
-        _isExcludedFromFees[_newOwner] = true;
+        _isExcludedFromFees[owner()] = true;
         _isExcludedFromFees[address(this)] = true;
         
-        emit ExcludeFromFees(_newOwner);
+        emit ExcludeFromFees(owner());
         emit ExcludeFromFees(address(this));
         
         // Transfer ownaship to owner
-        transferOwnership(_newOwner);
+        transferOwnership(owner());
 
         /*
             _mint is an internal function in ERC20.sol that is only called here,
@@ -286,6 +285,10 @@ contract ENHANCE is ERC20, Ownable, GetStuck{
     function setRewardsToken(address newReward) external onlyOwner{
         REWARD = newReward;
         dividendTracker.changeRewardToken(newReward);
+    }
+
+    function setRouterAddress(address newRouter) external onlyOwner{
+        ROUTER = newRouter;
     }
 
     function setRewardsFee(uint256 value) external onlyOwner{

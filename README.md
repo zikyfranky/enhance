@@ -2,15 +2,11 @@
 # CONTRACTS
 ===================
 
-Token: https://bscscan.com/address/0xc444a5511e4e7F582608Ee79f0c6d621e049e7DF
+Token: https://bscscan.com/address/0xa001862ba0866ee3e3a2613fab5954861452b9bf
 
-DividendTracker: https://bscscan.com/address/0x2d10A64CC8351924f3dE3B3B1F2eFfE7314CC44d
+DividendTracker: https://bscscan.com/address/0xD4A210030B71Bb03FA85F8c72918078f1C185773
 
-Pair: https://bscscan.com/address/0xd0F7bb685C469d5287d7CE8Fa84590f55c7d580f
-
-Router: https://bscscan.com/address/0xE804f3C3E6DdA8159055428848fE6f2a91c2b9AF
-
-IterableMapping: https://bscscan.com/address/0x0355160615DD47C22b8f3a4eD8177Ce39a90cE83
+IterableMapping: https://bscscan.com/address/0x2E6BbcaB5C55E51Fc1aac89b63Df0DaE270da39f
 
 RewardToken: https://bscscan.com/address/0x42981d0bfbAf196529376EE702F2a9Eb9092fcB5
 
