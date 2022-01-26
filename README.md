@@ -10,6 +10,8 @@ IterableMapping: https://bscscan.com/address/0x2E6BbcaB5C55E51Fc1aac89b63Df0DaE2
 
 RewardToken: https://bscscan.com/address/0x42981d0bfbAf196529376EE702F2a9Eb9092fcB5
 
+DirectSwap: https://bscscan.com/address/0x4EeacB4561bEE42D58B1486248f86beA7CAA7111
+
 ===================
 # METHODS
 ===================
